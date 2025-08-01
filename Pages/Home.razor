@@ -7,72 +7,68 @@
 @inject AppDbContext DbContext
 @inject ExpenseService ExpenseService
 @inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 
 <PageTitle>PayMeNext - Groups</PageTitle>
 
-<div class="home-container">
-    <header class="home-header">
-        <h1 class="text-xxl">PayMeNext</h1>
-        <p class="text-secondary">Split expenses, track payments, and stay organized</p>
+<div class="home-container text-white">
+    <header class="home-header mb-8">
+        <h1 class="text-5xl font-bold mb-2">PayMeNext</h1>
+        <p class="text-lg text-gray-400">Split expenses, track payments, and stay organized</p>
     </header>
 
     <div class="groups-section">
-        <div class="section-header">
-            <h2 class="text-xl">Your Groups</h2>
-            <Button Variant="primary" Icon="plus" OnClick="OpenNewGroupModal">
-                New Group
-            </Button>
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-semibold">Your Groups</h2>
+            <Button Variant="primary"  OnClick="OpenNewGroupModal">New Group</Button>
         </div>
 
         @if (groups == null)
         {
-            <div class="loading-state">
-                <div class="loading-spinner"></div>
-                <p>Loading groups...</p>
+            <div class="text-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <p class="text-gray-400">Loading groups...</p>
             </div>
         }
         else if (!groups.Any())
         {
-            <div class="empty-state">
-                <div class="empty-icon">💰</div>
-                <h3>No groups yet</h3>
-                <p>Create your first group to start splitting expenses</p>
-                <Button Variant="primary" Size="lg" OnClick="OpenNewGroupModal">
-                    Create Your First Group
-                </Button>
+            <div class="text-center py-16 bg-gray-800 rounded-lg shadow-inner">
+                <div class="text-6xl mb-4">💰</div>
+                <h3 class="text-2xl font-semibold mb-2">No groups yet</h3>
+                <p class="text-gray-400 mb-6">Create your first group to start splitting expenses</p>
+                <Button Variant="primary" Size="lg" OnClick="OpenNewGroupModal">Create Your First Group</Button>
             </div>
         }
         else
         {
-            <div class="groups-grid">
+            <div class="groups-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach (var group in groups)
                 {
-                    <div class="group-card-wrapper" @onclick="() => NavigateToGroup(group.Id)">
-                        <Card Title="@group.Name" Interactive="true">
-                            <div class="group-stats">
-                            <div class="stat">
-                                <span class="stat-label">Members</span>
-                                <span class="stat-value">@group.Members.Count</span>
+                    <div class="group-card-wrapper cursor-pointer" @onclick="() => NavigateToGroup(group.Id)">
+                        <Card Title="@group.Name" Interactive="true" Class="bg-gray-800 hover:bg-gray-700 transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+                            <div class="p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <div class="text-sm text-gray-400">@group.Created.ToString("MMM dd, yyyy")</div>
+                                    <div class="text-lg font-bold text-blue-400">$@group.Expenses.Sum(e => e.Amount).ToString("F2")</div>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="flex -space-x-2 overflow-hidden">
+                                        @foreach (var member in group.Members.Take(5))
+                                        {
+                                            <div class="inline-block h-8 w-8 rounded-full bg-gray-600 ring-2 ring-gray-800 flex items-center justify-center text-xs">@member.Substring(0, 1)</div>
+                                        }
+                                        @if (group.Members.Count > 5)
+                                        {
+                                            <div class="inline-block h-8 w-8 rounded-full bg-gray-500 ring-2 ring-gray-800 flex items-center justify-center text-xs">+@(group.Members.Count - 5)</div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-400">
+                                    <span>@group.Members.Count Members</span>
+                                    <span class="mx-2">·</span>
+                                    <span>@group.Expenses.Count Expenses</span>
+                                </div>
                             </div>
-                            <div class="stat">
-                                <span class="stat-label">Expenses</span>
-                                <span class="stat-value">@group.Expenses.Count</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Total</span>
-                                <span class="stat-value accent-blue">$@group.Expenses.Sum(e => e.Amount).ToString("F2")</span>
-                            </div>
-                        </div>
-                        <div class="group-members">
-                            @foreach (var member in group.Members.Take(3))
-                            {
-                                <span class="member-badge">@member</span>
-                            }
-                            @if (group.Members.Count > 3)
-                            {
-                                <span class="member-badge-more">+@(group.Members.Count - 3)</span>
-                            }
-                        </div>
                         </Card>
                     </div>
                 }
@@ -80,51 +76,40 @@
         }
     </div>
 
-    <!-- Floating Action Button -->
-    <button class="fab" @onclick="OpenNewGroupModal" title="Add New Group">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
+    <button class="fab fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg transition-transform duration-300 transform hover:scale-110" @onclick="OpenNewGroupModal" title="Add New Group">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </button>
 </div>
 
-<!-- New Group Modal -->
 <Modal IsOpen="showNewGroupModal" Title="Create New Group" Size="md" IsOpenChanged="OnNewGroupModalChanged">
     <ChildContent>
-    <div class="form-group">
-        <label class="form-label">Group Name</label>
-        <input type="text" class="form-control" @bind="newGroupName" placeholder="e.g., Florida Destin Trip" />
-    </div>
-    
-    <div class="form-group">
-        <label class="form-label">Members</label>
-        <div class="members-input">
-            <input type="text" class="form-control" @bind="newMemberName" 
-                   @onkeypress="OnMemberKeyPress" 
-                   placeholder="Enter member name and press Enter" />
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-300 mb-2">Group Name</label>
+            <input type="text" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" @bind="newGroupName" placeholder="e.g., Florida Destin Trip" />
         </div>
-        
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-300 mb-2">Members</label>
+            <div class="flex">
+                <input type="text" class="flex-grow bg-gray-700 border border-gray-600 rounded-l-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" @bind="newMemberName" @onkeypress="OnMemberKeyPress" placeholder="Enter member name and press Enter" />
+                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg" @onclick="AddMember">Add</button>
+            </div>
+        </div>
         @if (newGroupMembers.Any())
         {
-            <div class="members-list">
+            <div class="flex flex-wrap gap-2">
                 @foreach (var member in newGroupMembers)
                 {
-                    <span class="member-tag">
+                    <span class="bg-gray-600 text-gray-200 rounded-full px-3 py-1 text-sm flex items-center">
                         @member
-                        <button type="button" @onclick="() => RemoveMember(member)" class="remove-member">×</button>
+                        <button type="button" class="ml-2 text-gray-400 hover:text-white" @onclick="() => RemoveMember(member)">×</button>
                     </span>
                 }
             </div>
         }
-    </div>
-
     </ChildContent>
     <FooterActions>
         <Button Variant="outline" OnClick="CancelNewGroup">Cancel</Button>
-        <Button Variant="primary" OnClick="CreateGroup" Disabled="string.IsNullOrWhiteSpace(newGroupName) || !newGroupMembers.Any()">
-            Create Group
-        </Button>
+        <Button Variant="primary" OnClick="CreateGroup" Disabled="string.IsNullOrWhiteSpace(newGroupName) || !newGroupMembers.Any()">Create Group</Button>
     </FooterActions>
 </Modal>
 
@@ -140,6 +125,16 @@
         await LoadGroups();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".home-header", new { opacity = 0, y = -50, duration = 0.8, ease = "power3.out" });
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".group-card-wrapper", new { opacity = 0, y = 50, duration = 0.5, stagger = 0.1, ease = "power2.out" });
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".fab", new { scale = 0, duration = 0.5, ease = "back.out(1.7)", delay = 0.5 });
+        }
+    }
+
     private async Task LoadGroups()
     {
         await DbContext.SeedDataAsync();
@@ -151,9 +146,7 @@
 
     private void NavigateToGroup(int groupId)
     {
-        // Navigate to group detail page
-        // This would use NavigationManager in a real app
-        JSRuntime.InvokeVoidAsync("console.log", $"Navigating to group {groupId}");
+        NavigationManager.NavigateTo($"/groups/{groupId}");
     }
 
     private void OpenNewGroupModal()
@@ -174,15 +167,20 @@
         showNewGroupModal = false;
     }
 
+    private void AddMember()
+    {
+        if (!string.IsNullOrWhiteSpace(newMemberName) && !newGroupMembers.Contains(newMemberName))
+        {
+            newGroupMembers.Add(newMemberName);
+            newMemberName = "";
+        }
+    }
+
     private async Task OnMemberKeyPress(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(newMemberName))
+        if (e.Key == "Enter")
         {
-            if (!newGroupMembers.Contains(newMemberName))
-            {
-                newGroupMembers.Add(newMemberName);
-                newMemberName = "";
-            }
+            AddMember();
         }
     }
 
@@ -208,9 +206,7 @@
 
         await LoadGroups();
         showNewGroupModal = false;
+        StateHasChanged();
+        await JSRuntime.InvokeVoidAsync("gsap.from", ".group-card-wrapper", new { opacity = 0, y = 50, duration = 0.5, stagger = 0.1, ease = "power2.out" });
     }
 }
-
-<style>
-
-</style>

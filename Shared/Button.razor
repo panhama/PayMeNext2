@@ -1,51 +1,50 @@
 @namespace PayMeNextApp.Shared
 
-<button class="btn @GetButtonClass()" 
+<button class="@ButtonClass" 
         type="@Type" 
         disabled="@Disabled"
-        @onclick="OnClick"
-        @onclick:stopPropagation="true">
-    @if (!string.IsNullOrEmpty(Icon))
+        @onclick="OnClick">
+    @if (Icon != null)
     {
-        <i class="@Icon mr-2"></i>
+        <span class="mr-2">@Icon</span>
     }
     @ChildContent
 </button>
 
 @code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public string Variant { get; set; } = "primary";
     [Parameter] public string Size { get; set; } = "md";
     [Parameter] public string Type { get; set; } = "button";
     [Parameter] public bool Disabled { get; set; }
-    [Parameter] public string? Icon { get; set; }
-    [Parameter] public EventCallback OnClick { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Icon { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter] public string Class { get; set; } = "";
 
-    private string GetButtonClass()
+    private string ButtonClass
     {
-        var baseClass = "btn";
-        var variantClass = Variant switch
+        get
         {
-            "primary" => "btn-primary",
-            "secondary" => "btn-secondary",
-            "danger" => "btn-danger",
-            "success" => "btn-success",
-            "outline" => "btn-outline",
-            _ => "btn-primary"
-        };
-        
-        var sizeClass = Size switch
-        {
-            "sm" => "btn-sm",
-            "lg" => "btn-lg",
-            "xl" => "btn-xl",
-            _ => "btn-md"
-        };
+            var baseClasses = "font-bold rounded-lg shadow-md transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed";
 
-        return $"{baseClass} {variantClass} {sizeClass}";
+            var sizeClasses = Size switch
+            {
+                "sm" => "px-3 py-1.5 text-sm",
+                "lg" => "px-6 py-3 text-lg",
+                _ => "px-4 py-2 text-base"
+            };
+
+            var variantClasses = Variant switch
+            {
+                "primary" => "bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500",
+                "secondary" => "bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500",
+                "danger" => "bg-red-600 hover:bg-red-700 text-white focus:ring-red-500",
+                "success" => "bg-green-600 hover:bg-green-700 text-white focus:ring-green-500",
+                "outline" => "bg-transparent border border-gray-500 text-gray-300 hover:bg-gray-700 hover:text-white focus:ring-gray-500",
+                _ => "bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500"
+            };
+
+            return $"{baseClasses} {sizeClasses} {variantClasses} {Class}";
+        }
     }
 }
-
-<style>
-
-</style>

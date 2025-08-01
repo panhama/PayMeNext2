@@ -1,4 +1,4 @@
-@page "/group/{GroupId:int}"
+@page "/groups/{GroupId:int}"
 @using Microsoft.EntityFrameworkCore
 @using PayMeNextApp.Data
 @using PayMeNextApp.Services
@@ -7,106 +7,92 @@
 @inject ExpenseService ExpenseService
 @inject ReminderService ReminderService
 @inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 
 <PageTitle>@(group?.Name ?? "Group Details") - PayMeNext</PageTitle>
 
 @if (group == null)
 {
-    <div class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>Loading group...</p>
+    <div class="flex justify-center items-center h-full">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
     </div>
 }
 else
 {
-    <div class="group-detail-container">
-        <!-- Header -->
-        <header class="group-header">
-            <div class="group-info">
-                <h1 class="text-xl">@group.Name</h1>
-                <p class="text-secondary">@group.Members.Count members • @expenses.Count expenses</p>
+    <div class="group-detail-container text-white">
+        <header class="group-header flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-4xl font-bold">@group.Name</h1>
+                <p class="text-gray-400">@group.Members.Count members • @expenses.Count expenses</p>
             </div>
-            <div class="group-actions">
-                <Button Variant="primary" OnClick="OpenAddExpenseModal">
-                    Add Expense
-                </Button>
-            </div>
+            <Button Variant="primary" OnClick="OpenAddExpenseModal">Add Expense</Button>
         </header>
 
-        <!-- Group Stats -->
-        <div class="stats-grid">
-            <Card Title="Total Expenses">
-                <div class="stat-large accent-blue">$@totalAmount.ToString("F2")</div>
+        <div class="stats-grid grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Card Class="bg-gray-800 text-center py-6">
+                <h4 class="text-gray-400 text-sm mb-2">Total Expenses</h4>
+                <div class="text-4xl font-bold text-blue-400">$@totalAmount.ToString("F2")</div>
             </Card>
-            <Card Title="Per Person">
-                <div class="stat-large">$@perPersonAmount.ToString("F2")</div>
+            <Card Class="bg-gray-800 text-center py-6">
+                <h4 class="text-gray-400 text-sm mb-2">Per Person</h4>
+                <div class="text-4xl font-bold">$@perPersonAmount.ToString("F2")</div>
             </Card>
-            <Card Title="Pending">
-                <div class="stat-large accent-gold">@unpaidCount</div>
+            <Card Class="bg-gray-800 text-center py-6">
+                <h4 class="text-gray-400 text-sm mb-2">Pending</h4>
+                <div class="text-4xl font-bold text-yellow-400">@unpaidCount</div>
             </Card>
         </div>
 
-        <!-- Expenses Table -->
-        <Card Title="Expenses">
+        <Card Class="bg-gray-800 p-6">
+            <h3 class="text-2xl font-semibold mb-6">Expenses</h3>
             @if (!expenses.Any())
             {
-                <div class="empty-state">
-                    <div class="empty-icon">📝</div>
-                    <h3>No expenses yet</h3>
-                    <p>Add your first expense to get started</p>
-                    <Button Variant="primary" OnClick="OpenAddExpenseModal">
-                        Add Expense
-                    </Button>
+                <div class="text-center py-12">
+                    <div class="text-5xl mb-4">📝</div>
+                    <h4 class="text-xl font-semibold mb-2">No expenses yet</h4>
+                    <p class="text-gray-400 mb-6">Add your first expense to get started</p>
+                    <Button Variant="primary" OnClick="OpenAddExpenseModal">Add Expense</Button>
                 </div>
             }
             else
             {
-                <div class="expenses-table">
+                <div class="space-y-4">
                     @foreach (var expense in expenses.OrderByDescending(e => e.Date))
                     {
-                        <div class="expense-row table-row-hover">
-                            <div class="expense-info">
-                                <div class="expense-icon">💰</div>
-                                <div class="expense-details">
-                                    <h4>@expense.Description</h4>
-                                    <p class="text-secondary">@expense.Date.ToString("MMM dd, yyyy") • by @expense.CreatedBy</p>
-                                </div>
-                            </div>
-                            <div class="expense-amount">
-                                <span class="amount">$@expense.Amount.ToString("F2")</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Split entries for this expense -->
-                        <div class="split-entries">
-                            @foreach (var split in expense.SplitEntries)
-                            {
-                                <div class="split-entry @(split.Paid ? "paid" : "unpaid")">
-                                    <div class="split-info">
-                                        <span class="participant">@split.Participant</span>
-                                        <span class="share">$@split.Share.ToString("F2")</span>
+                        <div class="expense-item bg-gray-700 rounded-lg p-4">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center mr-4">
+                                        <span class="text-2xl">💰</span>
                                     </div>
-                                    <div class="split-actions">
-                                        <button class="paid-toggle @(split.Paid ? "paid" : "")" 
-                                                @onclick="() => TogglePaid(split.Id)">
-                                            @if (split.Paid)
+                                    <div>
+                                        <h4 class="font-semibold text-lg">@expense.Description</h4>
+                                        <p class="text-sm text-gray-400">@expense.Date.ToString("MMM dd, yyyy") • by @expense.CreatedBy</p>
+                                    </div>
+                                </div>
+                                <div class="text-xl font-bold">$@expense.Amount.ToString("F2")</div>
+                            </div>
+                            <div class="split-entries-container mt-4 pl-16">
+                                @foreach (var split in expense.SplitEntries)
+                                {
+                                    <div class="flex justify-between items-center py-2 border-t border-gray-600">
+                                        <div class="flex items-center">
+                                            <span class="w-6 h-6 rounded-full @(split.Paid ? "bg-green-500" : "bg-yellow-500") mr-3"></span>
+                                            <span>@split.Participant</span>
+                                            <span class="ml-4 text-gray-400">$@split.Share.ToString("F2")</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            @if (!split.Paid)
                                             {
-                                                <span class="badge-animated accent-gold">✓ Paid</span>
+                                                <Button Variant="outline" Size="sm" OnClick="() => SendReminder(split.Id)" Class="mr-2">Remind</Button>
                                             }
-                                            else
-                                            {
-                                                <span>Mark Paid</span>
-                                            }
-                                        </button>
-                                        @if (!split.Paid)
-                                        {
-                                            <Button Variant="outline" Size="sm" OnClick="() => SendReminder(split.Id)">
-                                                Remind
+                                            <Button Variant="@(split.Paid ? "secondary" : "primary")" Size="sm" OnClick="() => TogglePaid(split.Id)">
+                                                @(split.Paid ? "Paid" : "Mark Paid")
                                             </Button>
-                                        }
+                                        </div>
                                     </div>
-                                </div>
-                            }
+                                }
+                            </div>
                         </div>
                     }
                 </div>
@@ -115,60 +101,50 @@ else
     </div>
 }
 
-<!-- Add Expense Modal -->
-<Modal IsOpen="showAddExpenseModal" Title="Add Expense" Size="lg" IsOpenChanged="OnAddExpenseModalChanged">
+<Modal IsOpen="showAddExpenseModal" Title="Add New Expense" Size="lg" IsOpenChanged="OnAddExpenseModalChanged">
     <ChildContent>
-    <ChildContent>
-        <div class="form-group">
-        <label class="form-label">Description</label>
-        <input type="text" class="form-control" @bind="newExpenseDescription" 
-               placeholder="e.g., Beach House Rental" />
-    </div>
-    
-    <div class="form-group">
-        <label class="form-label">Amount</label>
-        <input type="number" step="0.01" class="form-control" @bind="newExpenseAmount" 
-               placeholder="0.00" />
-    </div>
-    
-    <div class="form-group">
-        <label class="form-label">Date</label>
-        <input type="date" class="form-control" @bind="newExpenseDate" />
-    </div>
-    
-    <div class="form-group">
-        <label class="form-label">Split Between</label>
-        <div class="participants-grid">
-            @foreach (var member in group?.Members ?? new List<string>())
-            {
-                <label class="participant-checkbox">
-                    <input type="checkbox" checked="@selectedParticipants.Contains(member)" 
-                           @onchange="@(e => ToggleParticipant(member, (bool)e.Value!))" />
-                    <span>@member</span>
-                </label>
-            }
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                <input type="text" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" @bind="newExpenseDescription" placeholder="e.g., Beach House Rental" />
+            </div>
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Amount</label>
+                <input type="number" step="0.01" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" @bind="newExpenseAmount" placeholder="0.00" />
+            </div>
         </div>
+        <div class="form-group mt-6">
+            <label class="block text-sm font-medium text-gray-300 mb-2">Date</label>
+            <input type="date" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" @bind="newExpenseDate" />
         </div>
-    </ChildContent>
+        <div class="form-group mt-6">
+            <label class="block text-sm font-medium text-gray-300 mb-2">Split Between</label>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                @foreach (var member in group?.Members ?? new List<string>())
+                {
+                    <label class="flex items-center bg-gray-700 p-3 rounded-lg cursor-pointer">
+                        <input type="checkbox" class="form-checkbox h-5 w-5 bg-gray-800 border-gray-600 text-blue-500 focus:ring-blue-500" checked="@selectedParticipants.Contains(member)" @onchange="@(e => ToggleParticipant(member, (bool)e.Value!))" />
+                        <span class="ml-3 text-white">@member</span>
+                    </label>
+                }
+            </div>
+        </div>
     </ChildContent>
     <FooterActions>
         <Button Variant="outline" OnClick="CancelAddExpense">Cancel</Button>
-        <Button Variant="primary" OnClick="AddExpense" 
-                Disabled="string.IsNullOrWhiteSpace(newExpenseDescription) || newExpenseAmount <= 0 || !selectedParticipants.Any()">
-            Add Expense
-        </Button>
+        <Button Variant="primary" OnClick="AddExpense" Disabled="string.IsNullOrWhiteSpace(newExpenseDescription) || newExpenseAmount <= 0 || !selectedParticipants.Any()">Add Expense</Button>
     </FooterActions>
 </Modal>
 
 @code {
     [Parameter] public int GroupId { get; set; }
-    
+
     private Group? group;
     private List<Expense> expenses = new();
     private decimal totalAmount;
     private decimal perPersonAmount;
     private int unpaidCount;
-    
+
     private bool showAddExpenseModal = false;
     private string newExpenseDescription = "";
     private decimal newExpenseAmount;
@@ -178,6 +154,16 @@ else
     protected override async Task OnInitializedAsync()
     {
         await LoadGroupData();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".group-header", new { opacity = 0, y = -50, duration = 0.8, ease = "power3.out" });
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".stats-grid > *", new { opacity = 0, y = 50, duration = 0.5, stagger = 0.2, ease = "power2.out" });
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".expense-item", new { opacity = 0, x = -50, duration = 0.5, stagger = 0.1, ease = "power2.out" });
+        }
     }
 
     private async Task LoadGroupData()
@@ -193,8 +179,6 @@ else
             totalAmount = expenses.Sum(e => e.Amount);
             perPersonAmount = group.Members.Any() ? totalAmount / group.Members.Count : 0;
             unpaidCount = expenses.SelectMany(e => e.SplitEntries).Count(s => !s.Paid);
-            
-            // Pre-select all members for new expenses
             selectedParticipants = group.Members.ToList();
         }
     }
@@ -220,11 +204,11 @@ else
 
     private void ToggleParticipant(string member, bool isSelected)
     {
-        if (isSelected && !selectedParticipants.Contains(member))
+        if (isSelected)
         {
-            selectedParticipants.Add(member);
+            if (!selectedParticipants.Contains(member)) selectedParticipants.Add(member);
         }
-        else if (!isSelected && selectedParticipants.Contains(member))
+        else
         {
             selectedParticipants.Remove(member);
         }
@@ -235,32 +219,23 @@ else
         if (group == null || string.IsNullOrWhiteSpace(newExpenseDescription) || newExpenseAmount <= 0 || !selectedParticipants.Any())
             return;
 
-        await ExpenseService.CreateExpenseAsync(
-            group.Id, 
-            newExpenseDescription, 
-            newExpenseAmount, 
-            selectedParticipants.First(), // For now, use first participant as creator
-            selectedParticipants
-        );
-
+        await ExpenseService.CreateExpenseAsync(group.Id, newExpenseDescription, newExpenseAmount, group.Members.First(), selectedParticipants);
         await LoadGroupData();
         showAddExpenseModal = false;
+        StateHasChanged();
+        await JSRuntime.InvokeVoidAsync("gsap.from", ".expense-item", new { opacity = 0, x = -50, duration = 0.5, stagger = 0.1, ease = "power2.out" });
     }
 
     private async Task TogglePaid(int splitEntryId)
     {
         await ExpenseService.TogglePaidStatusAsync(splitEntryId);
         await LoadGroupData();
+        StateHasChanged();
     }
 
     private async Task SendReminder(int splitEntryId)
     {
         await ReminderService.SendManualReminderAsync(splitEntryId, "Please settle your payment when convenient.");
-        
-        await JSRuntime.InvokeVoidAsync("alert", "Reminder sent!");
+        await JSRuntime.InvokeVoidAsync("showNotification", "Reminder Sent", "A friendly reminder has been sent.");
     }
 }
-
-<style>
-
-</style>

@@ -4,274 +4,90 @@
 
 <PageTitle>Settings - PayMeNext</PageTitle>
 
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
-    <div class="container mx-auto px-4 py-8 max-w-4xl">
-        <!-- Header with GSAP animation -->
-        <header class="text-center mb-12 gsap-fade-in">
-            <h1 class="text-4xl font-bold text-slate-800 dark:text-white mb-4">Settings</h1>
-            <p class="text-slate-600 dark:text-slate-300 text-lg">Customize your PayMeNext experience</p>
-        </header>
+<div class="settings-container text-white">
+    <header class="settings-header mb-8">
+        <h1 class="text-4xl font-bold">Settings</h1>
+        <p class="text-gray-400">Customize your PayMeNext experience</p>
+    </header>
 
-        <div class="space-y-8">
-            <!-- Theme Settings -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-6 gsap-slide-up">
-                <div class="flex items-center mb-6">
-                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mr-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-slate-800 dark:text-white">Appearance</h2>
+    <div class="space-y-8">
+        <Card Class="bg-gray-800 p-6">
+            <h3 class="text-2xl font-semibold mb-6">Appearance</h3>
+            <div class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <label class="text-lg">Theme</label>
+                    <select class="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" @bind="selectedTheme">
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                        <option value="system">System</option>
+                    </select>
                 </div>
-                
-                <!-- Theme Selection -->
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-medium text-slate-700 dark:text-slate-200">Theme</h3>
-                            <p class="text-slate-500 dark:text-slate-400">Choose your preferred color scheme</p>
-                        </div>
-                        <select class="px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" @bind="selectedTheme">
-                            <option value="dark">Dark Mode</option>
-                            <option value="light">Light Mode</option>
-                            <option value="auto">System</option>
-                        </select>
-                    </div>
-
-                    <!-- Accent Colors -->
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-medium text-slate-700 dark:text-slate-200">Accent Color</h3>
-                            <p class="text-slate-500 dark:text-slate-400">Customize the accent color</p>
-                        </div>
-                        <div class="flex space-x-3">
-                            <button class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 ring-2 ring-blue-200 hover:scale-110 transition-transform duration-200 gsap-bounce" 
-                                    @onclick='() => SetAccentColor("#00BFFF")'></button>
-                            <button class="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:scale-110 transition-transform duration-200 gsap-bounce" 
-                                    @onclick='() => SetAccentColor("#FFD700")'></button>
-                            <button class="w-8 h-8 rounded-full bg-gradient-to-r from-red-400 to-red-600 hover:scale-110 transition-transform duration-200 gsap-bounce" 
-                                    @onclick='() => SetAccentColor("#FF6B6B")'></button>
-                            <button class="w-8 h-8 rounded-full bg-gradient-to-r from-teal-400 to-teal-600 hover:scale-110 transition-transform duration-200 gsap-bounce" 
-                                    @onclick='() => SetAccentColor("#4ECDC4")'></button>
-                            <button class="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-400 to-indigo-600 hover:scale-110 transition-transform duration-200 gsap-bounce" 
-                                    @onclick='() => SetAccentColor("#45B7D1")'></button>
-                        </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-lg">Accent Color</label>
+                    <div class="flex space-x-3">
+                        <button class="w-8 h-8 rounded-full bg-blue-500" @onclick='() => SetAccentColor("blue")'></button>
+                        <button class="w-8 h-8 rounded-full bg-green-500" @onclick='() => SetAccentColor("green")'></button>
+                        <button class="w-8 h-8 rounded-full bg-purple-500" @onclick='() => SetAccentColor("purple")'></button>
                     </div>
                 </div>
             </div>
+        </Card>
 
-            <!-- Notification Settings -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-6 gsap-slide-up">
-                <div class="flex items-center mb-6">
-                    <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mr-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7H4l5-5v5z"></path>
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-slate-800 dark:text-white">Notifications</h2>
+        <Card Class="bg-gray-800 p-6">
+            <h3 class="text-2xl font-semibold mb-6">Notifications</h3>
+            <div class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <label class="text-lg">Enable Notifications</label>
+                    <input type="checkbox" class="form-checkbox h-6 w-6 bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-500" @bind="notificationsEnabled" />
                 </div>
-                
-                <div class="space-y-6">
-                    <!-- Push Notifications Toggle -->
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-medium text-slate-700 dark:text-slate-200">Push Notifications</h3>
-                            <p class="text-slate-500 dark:text-slate-400">Receive payment reminders and updates</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" @bind="notificationsEnabled" class="sr-only peer">
-                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-blue-600"></div>
-                        </label>
-                    </div>
-
-                    <!-- Reminder Frequency -->
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-medium text-slate-700 dark:text-slate-200">Reminder Frequency</h3>
-                            <p class="text-slate-500 dark:text-slate-400">How often to send payment reminders</p>
-                        </div>
-                        <select class="px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed" 
-                                @bind="reminderFrequency" disabled="@(!notificationsEnabled)">
-                            <option value="daily">Daily</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="manual">Manual Only</option>
-                        </select>
-                    </div>
-
-                    <!-- Sound Toggle -->
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-medium text-slate-700 dark:text-slate-200">Sound</h3>
-                            <p class="text-slate-500 dark:text-slate-400">Play sounds for notifications</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" @bind="soundEnabled" disabled="@(!notificationsEnabled)" class="sr-only peer">
-                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"></div>
-                        </label>
-                    </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-lg">Reminder Frequency</label>
+                    <select class="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" @bind="reminderFrequency" disabled="@(!notificationsEnabled)">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="manual">Manual</option>
+                    </select>
                 </div>
             </div>
+        </Card>
 
-            <!-- Currency & Locale Settings -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-6 gsap-slide-up">
-                <div class="flex items-center mb-6">
-                    <div class="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center mr-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-slate-800 dark:text-white">Currency & Locale</h2>
-                </div>
-                
-                <div class="space-y-6">
-                    <!-- Currency Selection -->
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-medium text-slate-700 dark:text-slate-200">Currency</h3>
-                            <p class="text-slate-500 dark:text-slate-400">Default currency for new expenses</p>
-                        </div>
-                        <select class="px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" @bind="selectedCurrency">
-                            <option value="USD">🇺🇸 US Dollar (USD)</option>
-                            <option value="EUR">🇪🇺 Euro (EUR)</option>
-                            <option value="GBP">🇬🇧 British Pound (GBP)</option>
-                            <option value="CAD">🇨🇦 Canadian Dollar (CAD)</option>
-                            <option value="AUD">🇦🇺 Australian Dollar (AUD)</option>
-                        </select>
-                    </div>
-
-                    <!-- Date Format -->
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-medium text-slate-700 dark:text-slate-200">Date Format</h3>
-                            <p class="text-slate-500 dark:text-slate-400">How dates are displayed</p>
-                        </div>
-                        <select class="px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" @bind="dateFormat">
-                            <option value="MM/dd/yyyy">MM/DD/YYYY</option>
-                            <option value="dd/MM/yyyy">DD/MM/YYYY</option>
-                            <option value="yyyy-MM-dd">YYYY-MM-DD</option>
-                        </select>
-                    </div>
-                </div>
+        <Card Class="bg-gray-800 p-6">
+            <h3 class="text-2xl font-semibold mb-6">Data Management</h3>
+            <div class="space-y-4">
+                <Button Variant="secondary" OnClick="ExportData">Export My Data</Button>
+                <Button Variant="danger" OnClick="ClearCache">Clear Local Cache</Button>
             </div>
-
-            <!-- Privacy & Security -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-6 gsap-slide-up">
-                <div class="flex items-center mb-6">
-                    <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg flex items-center justify-center mr-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-slate-800 dark:text-white">Privacy & Security</h2>
-                </div>
-                
-                <div class="space-y-4">
-                    <!-- Data Export -->
-                    <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
-                        <div>
-                            <h3 class="text-lg font-medium text-slate-700 dark:text-slate-200">Data Export</h3>
-                            <p class="text-slate-500 dark:text-slate-400">Download all your data</p>
-                        </div>
-                        <button @onclick="ExportData" 
-                                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 gsap-button">
-                            Export Data
-                        </button>
-                    </div>
-
-                    <!-- Clear Cache -->
-                    <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
-                        <div>
-                            <h3 class="text-lg font-medium text-slate-700 dark:text-slate-200">Clear Cache</h3>
-                            <p class="text-slate-500 dark:text-slate-400">Clear locally stored data</p>
-                        </div>
-                        <button @onclick="ClearCache" 
-                                class="px-6 py-2 bg-slate-600 hover:bg-slate-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 gsap-button">
-                            Clear Cache
-                        </button>
-                    </div>
-
-                    <!-- Reset App -->
-                    <div class="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                        <div>
-                            <h3 class="text-lg font-medium text-red-700 dark:text-red-300">Reset App</h3>
-                            <p class="text-red-500 dark:text-red-400">Delete all data and start fresh</p>
-                        </div>
-                        <button @onclick="ResetApp" 
-                                class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 gsap-button">
-                            Reset App
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- About Section -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-6 gsap-slide-up">
-                <div class="flex items-center mb-6">
-                    <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mr-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-slate-800 dark:text-white">About</h2>
-                </div>
-                
-                <div class="text-center">
-                    <h3 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">PayMeNext</h3>
-                    <p class="text-slate-500 dark:text-slate-400 mb-4">Version 1.0.0</p>
-                    <p class="text-slate-600 dark:text-slate-300 mb-6 max-w-2xl mx-auto">
-                        Split expenses, track payments, and stay organized with your group spending.
-                        Built with Blazor WebAssembly and designed for modern teams.
-                    </p>
-                    
-                    <div class="flex justify-center space-x-6 text-sm">
-                        <a href="#" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">Privacy Policy</a>
-                        <a href="#" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">Terms of Service</a>
-                        <a href="#" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">Support</a>
-                        <a href="#" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">GitHub</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </Card>
     </div>
 </div>
 
 @code {
     private string selectedTheme = "dark";
-    private string selectedCurrency = "USD";
-    private string dateFormat = "MM/dd/yyyy";
     private string reminderFrequency = "weekly";
     private bool notificationsEnabled = true;
-    private bool soundEnabled = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".settings-header", new { opacity = 0, y = -50, duration = 0.8, ease = "power3.out" });
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".card", new { opacity = 0, y = 50, duration = 0.5, stagger = 0.2, ease = "power2.out" });
+        }
+    }
 
     private void SetAccentColor(string color)
     {
-        // In a real app, this would update the CSS custom properties
-        Console.WriteLine($"Setting accent color to: {color}");
+        // Logic to change accent color
     }
 
-    private async Task ExportData()
+    private void ExportData()
     {
-        // Implementation for data export
-        await Task.Delay(1000); // Simulate export process
-        Console.WriteLine("Exporting user data...");
+        // Logic to export data
     }
 
-    private async Task ClearCache()
+    private void ClearCache()
     {
-        // Implementation for clearing cache
-        await Task.Delay(500);
-        Console.WriteLine("Cache cleared");
-    }
-
-    private async Task ResetApp()
-    {
-        // Implementation for app reset
-        var confirm = await Task.FromResult(true); // In real app, show confirmation dialog
-        if (confirm)
-        {
-            Console.WriteLine("App reset");
-        }
+        // Logic to clear cache
     }
 }
 

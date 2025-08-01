@@ -1,12 +1,25 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
+@inject IJSRuntime JSRuntime
+
+<div class="flex h-screen bg-gray-900 text-white">
+    <div class="sidebar-container w-64 bg-gray-800 shadow-lg">
+        <NavMenu />
     </div>
 
-    <main class="main-content">
-        <article class="content">
+    <main class="main-content-container flex-1 flex flex-col overflow-hidden">
+        <div class="main-content flex-1 overflow-y-auto p-8">
             @Body
-        </article>
+        </div>
     </main>
 </div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".sidebar-container", new { x = -200, duration = 1, ease = "power3.out" });
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".main-content-container", new { opacity = 0, duration = 1, delay = 0.5 });
+        }
+    }
+}

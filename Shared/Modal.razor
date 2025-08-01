@@ -1,28 +1,25 @@
 @namespace PayMeNextApp.Shared
-@implements IDisposable
+@inject IJSRuntime JSRuntime
 
 @if (IsOpen)
 {
-    <div class="modal-overlay" @onclick="OnOverlayClick">
-        <div class="modal-content @GetModalClass()" @onclick:stopPropagation="true">
-            <div class="modal-header">
-                <h2 class="modal-title">@Title</h2>
-                <button class="modal-close" @onclick="CloseModal" aria-label="Close">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
+    <div id="@modalId" class="fixed inset-0 z-50 flex items-center justify-center p-4" @onclick="OnOverlayClick">
+        <div class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        <div class="modal-content-container relative bg-gray-800 text-white rounded-xl shadow-2xl w-full @ModalSizeClass" @onclick:stopPropagation="true">
+            <header class="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+                <h2 class="text-2xl font-semibold">@Title</h2>
+                <button class="text-gray-400 hover:text-white transition-colors" @onclick="CloseModal">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
-            </div>
-            
-            <div class="modal-body">
+            </header>
+            <main class="p-6">
                 @ChildContent
-            </div>
-            
+            </main>
             @if (FooterActions != null)
             {
-                <div class="modal-footer">
+                <footer class="px-6 py-4 bg-gray-700 rounded-b-xl flex justify-end space-x-4">
                     @FooterActions
-                </div>
+                </footer>
             }
         </div>
     </div>
@@ -30,27 +27,31 @@
 
 @code {
     [Parameter] public bool IsOpen { get; set; }
-    [Parameter] public string Title { get; set; } = "";
-    [Parameter] public string Size { get; set; } = "md";
-    [Parameter] public bool CloseOnOverlayClick { get; set; } = true;
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public string Title { get; set; } = "Modal Title";
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public RenderFragment? FooterActions { get; set; }
+    [Parameter] public string Size { get; set; } = "md";
+    [Parameter] public bool CloseOnOverlayClick { get; set; } = true;
 
-    private string GetModalClass()
+    private string modalId = "modal-" + Guid.NewGuid().ToString("N");
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        return Size switch
+        if (IsOpen)
         {
-            "sm" => "modal-sm",
-            "lg" => "modal-lg",
-            "xl" => "modal-xl",
-            "full" => "modal-full",
-            _ => "modal-md"
-        };
+            await JSRuntime.InvokeVoidAsync("gsap.fromTo", "#" + modalId + " .modal-backdrop", new { opacity = 0 }, new { opacity = 1, duration = 0.3 });
+            await JSRuntime.InvokeVoidAsync("gsap.fromTo", "#" + modalId + " .modal-content-container", 
+                new { opacity = 0, scale = 0.9, y = -20 }, 
+                new { opacity = 1, scale = 1, y = 0, duration = 0.4, ease = "power3.out" });
+        }
     }
 
     private async Task CloseModal()
     {
+        await JSRuntime.InvokeVoidAsync("gsap.to", "#" + modalId + " .modal-content-container", new { opacity = 0, scale = 0.9, y = -20, duration = 0.3, ease = "power2.in" });
+        await JSRuntime.InvokeVoidAsync("gsap.to", "#" + modalId + " .modal-backdrop", new { opacity = 0, duration = 0.3 });
+        await Task.Delay(300); // Wait for animation to complete
         IsOpen = false;
         await IsOpenChanged.InvokeAsync(IsOpen);
     }
@@ -63,17 +64,11 @@
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private string ModalSizeClass => Size switch
     {
-        if (IsOpen)
-        {
-            await Task.Delay(10); // Allow DOM to update
-            // You could add JS interop here to focus the modal or prevent body scroll
-        }
-    }
-
-    public void Dispose()
-    {
-        // Cleanup if needed
-    }
+        "sm" => "max-w-sm",
+        "lg" => "max-w-3xl",
+        "xl" => "max-w-5xl",
+        _ => "max-w-lg"
+    };
 }

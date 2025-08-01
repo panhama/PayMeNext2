@@ -1,15 +1,16 @@
 @namespace PayMeNextApp.Shared
 
-<div class="card @GetCardClass()">
-    @if (!string.IsNullOrEmpty(Title))
+<div class="@CardClass">
+    @if (Title != null || HeaderActions != null)
     {
-        <div class="card-header">
-            <h3 class="card-title">@Title</h3>
+        <div class="card-header px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+            @if (Title != null)
+            {
+                <h3 class="text-xl font-semibold">@Title</h3>
+            }
             @if (HeaderActions != null)
             {
-                <div class="card-actions">
-                    @HeaderActions
-                </div>
+                <div>@HeaderActions</div>
             }
         </div>
     }
@@ -20,7 +21,7 @@
     
     @if (FooterActions != null)
     {
-        <div class="card-footer">
+        <div class="card-footer px-6 py-4 border-t border-gray-700">
             @FooterActions
         </div>
     }
@@ -28,28 +29,19 @@
 
 @code {
     [Parameter] public string? Title { get; set; }
-    [Parameter] public string Variant { get; set; } = "default";
     [Parameter] public bool Interactive { get; set; } = false;
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public RenderFragment? HeaderActions { get; set; }
     [Parameter] public RenderFragment? FooterActions { get; set; }
+    [Parameter] public string Class { get; set; } = "";
 
-    private string GetCardClass()
+    private string CardClass
     {
-        var baseClass = "card";
-        var variantClass = Variant switch
+        get
         {
-            "elevated" => "card-elevated",
-            "outlined" => "card-outlined",
-            _ => "card-default"
-        };
-
-        var interactiveClass = Interactive ? "card-interactive" : "";
-
-        return $"{baseClass} {variantClass} {interactiveClass}".Trim();
+            var baseClasses = "bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-all duration-300";
+            var interactiveClasses = Interactive ? "hover:shadow-xl hover:transform hover:-translate-y-1 cursor-pointer" : "";
+            return $"{baseClasses} {interactiveClasses} {Class}";
+        }
     }
 }
-
-<style>
-
-</style>

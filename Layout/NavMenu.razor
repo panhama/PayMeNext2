@@ -1,52 +1,60 @@
-﻿<div class="nav-menu">
-    <nav class="nav-container">
-        <div class="nav-brand">
-            <a class="nav-brand-link" href="/">
-                <span class="brand-icon">💰</span>
-                <span class="brand-text">PayMeNext</span>
-            </a>
-        </div>
+﻿@inject IJSRuntime JSRuntime
 
-        <div class="nav-items">
-            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
-                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9,22 9,12 15,12 15,22"></polyline>
-                </svg>
-                <span class="nav-text">Groups</span>
-            </NavLink>
+<div class="flex flex-col h-full bg-gray-800 text-white shadow-lg">
+    <div class="nav-brand-container flex items-center justify-center h-20 border-b border-gray-700">
+        <a class="flex items-center text-2xl font-bold text-white" href="/">
+            <span class="mr-2 text-3xl">💰</span>
+            <span>PayMeNext</span>
+        </a>
+    </div>
 
-            <NavLink class="nav-link" href="/reminders">
-                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12,6 12,12 16,14"></polyline>
-                </svg>
-                <span class="nav-text">Reminders</span>
-            </NavLink>
+    <nav class="flex-1 px-4 py-6">
+        <NavLink class="nav-link-item flex items-center px-4 py-3 mb-2 text-lg text-gray-300 rounded-lg hover:bg-gray-700 transition-colors duration-300" href="/" Match="NavLinkMatch.All">
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9,22 9,12 15,12 15,22"></polyline>
+            </svg>
+            <span>Groups</span>
+        </NavLink>
 
-            <NavLink class="nav-link" href="/settings">
-                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M12 1v6m0 6v6"></path>
-                    <path d="m9 9 3-3 3 3"></path>
-                    <path d="m9 15 3 3 3-3"></path>
-                </svg>
-                <span class="nav-text">Settings</span>
-            </NavLink>
-        </div>
+        <NavLink class="nav-link-item flex items-center px-4 py-3 mb-2 text-lg text-gray-300 rounded-lg hover:bg-gray-700 transition-colors duration-300" href="/reminders">
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12,6 12,12 16,14"></polyline>
+            </svg>
+            <span>Reminders</span>
+        </NavLink>
 
-        <div class="nav-footer">
-            <div class="user-info">
-                <div class="user-avatar">👤</div>
-                <div class="user-details">
-                    <span class="user-name">Demo User</span>
-                    <span class="user-role">Free Plan</span>
-                </div>
+        <NavLink class="nav-link-item flex items-center px-4 py-3 text-lg text-gray-300 rounded-lg hover:bg-gray-700 transition-colors duration-300" href="/settings">
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Settings</span>
+        </NavLink>
+    </nav>
+
+    <div class="nav-footer-container mt-auto p-4 border-t border-gray-700">
+        <div class="flex items-center">
+            <div class="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center mr-4">
+                <span class="text-2xl">👤</span>
+            </div>
+            <div>
+                <div class="font-bold text-lg">Demo User</div>
+                <div class="text-sm text-gray-400">Free Plan</div>
             </div>
         </div>
-    </nav>
+    </div>
 </div>
 
 @code {
-
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".nav-brand-container", new { opacity = 0, y = -50, duration = 0.8, ease = "power3.out" });
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".nav-link-item", new { opacity = 0, x = -50, duration = 0.5, stagger = 0.2, ease = "power2.out" });
+            await JSRuntime.InvokeVoidAsync("gsap.from", ".nav-footer-container", new { opacity = 0, y = 50, duration = 0.8, ease = "power3.out" });
+        }
+    }
 }

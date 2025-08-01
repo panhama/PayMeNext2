@@ -18,7 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Services
 builder.Services.AddScoped<ExpenseService>();
-builder.Services.AddSingleton<ReminderService>();
+builder.Services.AddScoped<ReminderService>();
 
 var host = builder.Build();
 

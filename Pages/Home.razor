@@ -1,0 +1,216 @@
+﻿@page "/"
+@page "/groups"
+@using Microsoft.EntityFrameworkCore
+@using PayMeNextApp.Data
+@using PayMeNextApp.Services
+@using PayMeNextApp.Shared
+@inject AppDbContext DbContext
+@inject ExpenseService ExpenseService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>PayMeNext - Groups</PageTitle>
+
+<div class="home-container">
+    <header class="home-header">
+        <h1 class="text-xxl">PayMeNext</h1>
+        <p class="text-secondary">Split expenses, track payments, and stay organized</p>
+    </header>
+
+    <div class="groups-section">
+        <div class="section-header">
+            <h2 class="text-xl">Your Groups</h2>
+            <Button Variant="primary" Icon="plus" OnClick="OpenNewGroupModal">
+                New Group
+            </Button>
+        </div>
+
+        @if (groups == null)
+        {
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading groups...</p>
+            </div>
+        }
+        else if (!groups.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">💰</div>
+                <h3>No groups yet</h3>
+                <p>Create your first group to start splitting expenses</p>
+                <Button Variant="primary" Size="lg" OnClick="OpenNewGroupModal">
+                    Create Your First Group
+                </Button>
+            </div>
+        }
+        else
+        {
+            <div class="groups-grid">
+                @foreach (var group in groups)
+                {
+                    <div class="group-card-wrapper" @onclick="() => NavigateToGroup(group.Id)">
+                        <Card Title="@group.Name" Interactive="true">
+                            <div class="group-stats">
+                            <div class="stat">
+                                <span class="stat-label">Members</span>
+                                <span class="stat-value">@group.Members.Count</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Expenses</span>
+                                <span class="stat-value">@group.Expenses.Count</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Total</span>
+                                <span class="stat-value accent-blue">$@group.Expenses.Sum(e => e.Amount).ToString("F2")</span>
+                            </div>
+                        </div>
+                        <div class="group-members">
+                            @foreach (var member in group.Members.Take(3))
+                            {
+                                <span class="member-badge">@member</span>
+                            }
+                            @if (group.Members.Count > 3)
+                            {
+                                <span class="member-badge-more">+@(group.Members.Count - 3)</span>
+                            }
+                        </div>
+                        </Card>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" @onclick="OpenNewGroupModal" title="Add New Group">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+    </button>
+</div>
+
+<!-- New Group Modal -->
+<Modal IsOpen="showNewGroupModal" Title="Create New Group" Size="md" IsOpenChanged="OnNewGroupModalChanged">
+    <ChildContent>
+    <div class="form-group">
+        <label class="form-label">Group Name</label>
+        <input type="text" class="form-control" @bind="newGroupName" placeholder="e.g., Florida Destin Trip" />
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Members</label>
+        <div class="members-input">
+            <input type="text" class="form-control" @bind="newMemberName" 
+                   @onkeypress="OnMemberKeyPress" 
+                   placeholder="Enter member name and press Enter" />
+        </div>
+        
+        @if (newGroupMembers.Any())
+        {
+            <div class="members-list">
+                @foreach (var member in newGroupMembers)
+                {
+                    <span class="member-tag">
+                        @member
+                        <button type="button" @onclick="() => RemoveMember(member)" class="remove-member">×</button>
+                    </span>
+                }
+            </div>
+        }
+    </div>
+
+    </ChildContent>
+    <FooterActions>
+        <Button Variant="outline" OnClick="CancelNewGroup">Cancel</Button>
+        <Button Variant="primary" OnClick="CreateGroup" Disabled="string.IsNullOrWhiteSpace(newGroupName) || !newGroupMembers.Any()">
+            Create Group
+        </Button>
+    </FooterActions>
+</Modal>
+
+@code {
+    private List<Group>? groups;
+    private bool showNewGroupModal = false;
+    private string newGroupName = "";
+    private string newMemberName = "";
+    private List<string> newGroupMembers = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadGroups();
+    }
+
+    private async Task LoadGroups()
+    {
+        await DbContext.SeedDataAsync();
+        groups = await DbContext.Groups
+            .Include(g => g.Expenses)
+            .OrderByDescending(g => g.Created)
+            .ToListAsync();
+    }
+
+    private void NavigateToGroup(int groupId)
+    {
+        // Navigate to group detail page
+        // This would use NavigationManager in a real app
+        JSRuntime.InvokeVoidAsync("console.log", $"Navigating to group {groupId}");
+    }
+
+    private void OpenNewGroupModal()
+    {
+        showNewGroupModal = true;
+        newGroupName = "";
+        newGroupMembers.Clear();
+        newMemberName = "";
+    }
+
+    private void OnNewGroupModalChanged(bool isOpen)
+    {
+        showNewGroupModal = isOpen;
+    }
+
+    private void CancelNewGroup()
+    {
+        showNewGroupModal = false;
+    }
+
+    private async Task OnMemberKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(newMemberName))
+        {
+            if (!newGroupMembers.Contains(newMemberName))
+            {
+                newGroupMembers.Add(newMemberName);
+                newMemberName = "";
+            }
+        }
+    }
+
+    private void RemoveMember(string member)
+    {
+        newGroupMembers.Remove(member);
+    }
+
+    private async Task CreateGroup()
+    {
+        if (string.IsNullOrWhiteSpace(newGroupName) || !newGroupMembers.Any())
+            return;
+
+        var group = new Group
+        {
+            Name = newGroupName,
+            Members = newGroupMembers.ToList(),
+            Created = DateTime.UtcNow
+        };
+
+        DbContext.Groups.Add(group);
+        await DbContext.SaveChangesAsync();
+
+        await LoadGroups();
+        showNewGroupModal = false;
+    }
+}
+
+<style>
+
+</style>

@@ -1,0 +1,79 @@
+@namespace PayMeNextApp.Shared
+@implements IDisposable
+
+@if (IsOpen)
+{
+    <div class="modal-overlay" @onclick="OnOverlayClick">
+        <div class="modal-content @GetModalClass()" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h2 class="modal-title">@Title</h2>
+                <button class="modal-close" @onclick="CloseModal" aria-label="Close">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                @ChildContent
+            </div>
+            
+            @if (FooterActions != null)
+            {
+                <div class="modal-footer">
+                    @FooterActions
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Size { get; set; } = "md";
+    [Parameter] public bool CloseOnOverlayClick { get; set; } = true;
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? FooterActions { get; set; }
+
+    private string GetModalClass()
+    {
+        return Size switch
+        {
+            "sm" => "modal-sm",
+            "lg" => "modal-lg",
+            "xl" => "modal-xl",
+            "full" => "modal-full",
+            _ => "modal-md"
+        };
+    }
+
+    private async Task CloseModal()
+    {
+        IsOpen = false;
+        await IsOpenChanged.InvokeAsync(IsOpen);
+    }
+
+    private async Task OnOverlayClick()
+    {
+        if (CloseOnOverlayClick)
+        {
+            await CloseModal();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (IsOpen)
+        {
+            await Task.Delay(10); // Allow DOM to update
+            // You could add JS interop here to focus the modal or prevent body scroll
+        }
+    }
+
+    public void Dispose()
+    {
+        // Cleanup if needed
+    }
+}

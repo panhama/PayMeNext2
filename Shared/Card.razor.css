@@ -1,0 +1,39 @@
+.card {
+    @apply bg-gray-800 rounded-xl border border-gray-700 overflow-hidden;
+}
+
+.card-default {
+    @apply shadow-sm;
+}
+
+.card-elevated {
+    @apply shadow-lg;
+}
+
+.card-outlined {
+    @apply border-2 border-gray-600;
+}
+
+.card-interactive {
+    @apply cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] hover:border-gray-500;
+}
+
+.card-header {
+    @apply flex items-center justify-between p-6 border-b border-gray-700;
+}
+
+.card-title {
+    @apply text-xl font-semibold text-white m-0;
+}
+
+.card-actions {
+    @apply flex items-center gap-2;
+}
+
+.card-content {
+    @apply p-6;
+}
+
+.card-footer {
+    @apply px-6 py-4 border-t border-gray-700 bg-gray-800/50;
+}

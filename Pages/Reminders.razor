@@ -1,0 +1,263 @@
+@page "/reminders"
+@using Microsoft.EntityFrameworkCore
+@using PayMeNextApp.Data
+@using PayMeNextApp.Services
+@using PayMeNextApp.Shared
+@inject AppDbContext DbContext
+@inject ReminderService ReminderService
+@inject ExpenseService ExpenseService
+
+<PageTitle>Reminders - PayMeNext</PageTitle>
+
+<div class="reminders-container">
+    <header class="reminders-header">
+        <h1 class="text-xl">Payment Reminders</h1>
+        <p class="text-secondary">Manage pending payments and send reminders</p>
+    </header>
+
+    <!-- Pending Reminders -->
+    <Card Title="Pending Reminders" Variant="elevated">
+        @if (pendingReminders == null)
+        {
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading reminders...</p>
+            </div>
+        }
+        else if (!pendingReminders.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">✅</div>
+                <h3>All caught up!</h3>
+                <p>No pending reminders at the moment</p>
+            </div>
+        }
+        else
+        {
+            <div class="reminders-list">
+                @foreach (var reminder in pendingReminders)
+                {
+                    <div class="reminder-item">
+                        <div class="reminder-info">
+                            <div class="reminder-details">
+                                <h4>@reminder.SplitEntry.Expense.Description</h4>
+                                <p class="group-name">@reminder.SplitEntry.Expense.Group.Name</p>
+                                <p class="participant-info">
+                                    <span class="participant">@reminder.SplitEntry.Participant</span>
+                                    owes <span class="amount accent-blue">$@reminder.SplitEntry.Share.ToString("F2")</span>
+                                </p>
+                                <p class="remind-time text-secondary">
+                                    Scheduled: @reminder.RemindAt.ToString("MMM dd, yyyy 'at' h:mm tt")
+                                </p>
+                            </div>
+                        </div>
+                        <div class="reminder-actions">
+                            <Button Variant="primary" Size="sm" OnClick="() => SendReminderNow(reminder.Id)">
+                                Send Now
+                            </Button>
+                            <Button Variant="outline" Size="sm" OnClick="() => EditReminder(reminder.Id)">
+                                Edit
+                            </Button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </Card>
+
+    <!-- Unpaid Splits (Create Reminders) -->
+    <Card Title="Unpaid Expenses" Variant="elevated">
+        @if (unpaidSplits == null)
+        {
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading unpaid expenses...</p>
+            </div>
+        }
+        else if (!unpaidSplits.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">💰</div>
+                <h3>All payments settled!</h3>
+                <p>Everyone is up to date with their payments</p>
+            </div>
+        }
+        else
+        {
+            <div class="unpaid-list">
+                @foreach (var split in unpaidSplits)
+                {
+                    <div class="unpaid-item">
+                        <div class="unpaid-info">
+                            <div class="unpaid-details">
+                                <h4>@split.Expense.Description</h4>
+                                <p class="group-name">@split.Expense.Group.Name</p>
+                                <p class="participant-info">
+                                    <span class="participant">@split.Participant</span>
+                                    owes <span class="amount accent-blue">$@split.Share.ToString("F2")</span>
+                                </p>
+                                <p class="expense-date text-secondary">
+                                    From @split.Expense.Date.ToString("MMM dd, yyyy")
+                                </p>
+                            </div>
+                        </div>
+                        <div class="unpaid-actions">
+                            <Button Variant="success" Size="sm" OnClick="() => MarkAsPaid(split.Id)">
+                                Mark Paid
+                            </Button>
+                            <Button Variant="outline" Size="sm" OnClick="() => CreateReminder(split.Id)">
+                                Set Reminder
+                            </Button>
+                            <Button Variant="secondary" Size="sm" OnClick="() => SendInstantReminder(split.Id)">
+                                Send Now
+                            </Button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </Card>
+
+    <!-- Badges Section -->
+    <Card Title="Achievement Badges" Variant="elevated">
+        <div class="badges-grid">
+            <div class="badge-item badge-animated">
+                <div class="badge-icon accent-gold">🏆</div>
+                <div class="badge-info">
+                    <h4>On-Time Payer</h4>
+                    <p>Pays within 3 days</p>
+                </div>
+            </div>
+            <div class="badge-item">
+                <div class="badge-icon">⭐</div>
+                <div class="badge-info">
+                    <h4>Group Organizer</h4>
+                    <p>Creates groups</p>
+                </div>
+            </div>
+            <div class="badge-item">
+                <div class="badge-icon">💎</div>
+                <div class="badge-info">
+                    <h4>Big Spender</h4>
+                    <p>$1000+ in expenses</p>
+                </div>
+            </div>
+            <div class="badge-item badge-locked">
+                <div class="badge-icon">🔒</div>
+                <div class="badge-info">
+                    <h4>Perfect Record</h4>
+                    <p>Pay 10 expenses on time</p>
+                </div>
+            </div>
+        </div>
+    </Card>
+</div>
+
+<!-- Create Reminder Modal -->
+<Modal IsOpen="showCreateReminderModal" Title="Set Reminder" Size="md" IsOpenChanged="OnCreateReminderModalChanged">
+    <ChildContent>
+    <div class="form-group">
+        <label class="form-label">Remind At</label>
+        <input type="datetime-local" class="form-control" @bind="reminderDateTime" />
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Custom Message (Optional)</label>
+        <textarea class="form-control" rows="3" @bind="reminderMessage" 
+                  placeholder="Add a personal note to the reminder..."></textarea>
+    </div>
+
+    </ChildContent>
+    <FooterActions>
+        <Button Variant="outline" OnClick="CancelCreateReminder">Cancel</Button>
+        <Button Variant="primary" OnClick="SaveReminder">
+            Set Reminder
+        </Button>
+    </FooterActions>
+</Modal>
+
+@code {
+    private List<Reminder>? pendingReminders;
+    private List<SplitEntry>? unpaidSplits;
+    
+    private bool showCreateReminderModal = false;
+    private int selectedSplitEntryId;
+    private DateTime reminderDateTime = DateTime.Now.AddDays(1);
+    private string reminderMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        // Load pending reminders
+        pendingReminders = await ReminderService.GetPendingRemindersAsync();
+        
+        // Load unpaid splits
+        unpaidSplits = await DbContext.SplitEntries
+            .Include(s => s.Expense)
+            .ThenInclude(e => e.Group)
+            .Where(s => !s.Paid)
+            .OrderByDescending(s => s.Expense.Date)
+            .ToListAsync();
+    }
+
+    private async Task SendReminderNow(int reminderId)
+    {
+        var success = await ReminderService.SendReminderAsync(reminderId);
+        if (success)
+        {
+            await LoadData(); // Refresh the list
+        }
+    }
+
+    private void EditReminder(int reminderId)
+    {
+        // Implementation for editing reminders
+        // For now, just log
+        Console.WriteLine($"Editing reminder {reminderId}");
+    }
+
+    private async Task MarkAsPaid(int splitEntryId)
+    {
+        await ExpenseService.TogglePaidStatusAsync(splitEntryId);
+        await LoadData();
+    }
+
+    private void CreateReminder(int splitEntryId)
+    {
+        selectedSplitEntryId = splitEntryId;
+        reminderDateTime = DateTime.Now.AddDays(1);
+        reminderMessage = "";
+        showCreateReminderModal = true;
+    }
+
+    private void OnCreateReminderModalChanged(bool isOpen)
+    {
+        showCreateReminderModal = isOpen;
+    }
+
+    private void CancelCreateReminder()
+    {
+        showCreateReminderModal = false;
+    }
+
+    private async Task SaveReminder()
+    {
+        await ReminderService.CreateReminderAsync(selectedSplitEntryId, reminderDateTime, reminderMessage);
+        await LoadData();
+        showCreateReminderModal = false;
+    }
+
+    private async Task SendInstantReminder(int splitEntryId)
+    {
+        await ReminderService.SendManualReminderAsync(splitEntryId, "Please settle your payment when convenient.");
+        // Could show a toast notification here
+    }
+}
+
+<style>
+
+</style>

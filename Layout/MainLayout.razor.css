@@ -1,0 +1,32 @@
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+}
+
+.sidebar {
+    background-image: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-elevated) 70%);
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    background-color: var(--color-background);
+    overflow-y: auto;
+}
+
+.content {
+    min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .sidebar {
+        position: absolute;
+        z-index: 1001;
+    }
+}

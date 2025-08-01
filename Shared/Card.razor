@@ -1,0 +1,55 @@
+@namespace PayMeNextApp.Shared
+
+<div class="card @GetCardClass()">
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <div class="card-header">
+            <h3 class="card-title">@Title</h3>
+            @if (HeaderActions != null)
+            {
+                <div class="card-actions">
+                    @HeaderActions
+                </div>
+            }
+        </div>
+    }
+    
+    <div class="card-content">
+        @ChildContent
+    </div>
+    
+    @if (FooterActions != null)
+    {
+        <div class="card-footer">
+            @FooterActions
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string Variant { get; set; } = "default";
+    [Parameter] public bool Interactive { get; set; } = false;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? HeaderActions { get; set; }
+    [Parameter] public RenderFragment? FooterActions { get; set; }
+
+    private string GetCardClass()
+    {
+        var baseClass = "card";
+        var variantClass = Variant switch
+        {
+            "elevated" => "card-elevated",
+            "outlined" => "card-outlined",
+            _ => "card-default"
+        };
+
+        var interactiveClass = Interactive ? "card-interactive" : "";
+
+        return $"{baseClass} {variantClass} {interactiveClass}".Trim();
+    }
+}
+
+<style>
+
+</style>

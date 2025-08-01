@@ -1,0 +1,20 @@
+# /JeraxApp/JeraxApp.csproj
+# /bin
+# /obj
+# .idea
+
+# Rider project files
+.idea/
+.idea
+# Build output
+/bin/
+/obj/
+
+# ASP.NET publish
+/publish/
+
+# VS user files
+*.suo
+*.user
+*.userprefs
+.gitignore
